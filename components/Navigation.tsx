@@ -6,6 +6,7 @@ import { createClient } from '@/lib/supabase'
 export default function Navigation() {
   const [girisYapildi, setGirisYapildi] = useState(false)
   const [yukleniyor, setYukleniyor] = useState(true)
+  const [menuAcik, setMenuAcik] = useState(false)
 
   useEffect(() => {
     const supabase = createClient()
@@ -22,6 +23,15 @@ export default function Navigation() {
     return () => subscription.unsubscribe()
   }, [])
 
+  useEffect(() => {
+    if (menuAcik) {
+      document.body.style.overflow = 'hidden'
+    } else {
+      document.body.style.overflow = ''
+    }
+    return () => { document.body.style.overflow = '' }
+  }, [menuAcik])
+
   const cikisYap = async () => {
     const supabase = createClient()
     await supabase.auth.signOut()
@@ -30,7 +40,7 @@ export default function Navigation() {
 
   return (
     <nav className="sticky top-0 z-50 backdrop-blur-md bg-background/80 border-b border-border">
-      <div className="max-w-3xl mx-auto px-6 sm:px-8 lg:px-4 h-16 flex items-center justify-between">
+      <div className="max-w-3xl mx-auto px-4 sm:px-8 lg:px-4 h-14 sm:h-16 flex items-center justify-between">
         <a href="/" className="group flex items-center gap-2">
           <svg
             width="28"
@@ -55,7 +65,8 @@ export default function Navigation() {
           </span>
         </a>
 
-        <div className="flex items-center gap-1">
+        {/* Desktop nav */}
+        <div className="hidden sm:flex items-center gap-1">
           <NavLink href="/">Bugün</NavLink>
           <NavLink href="/gunluk">Günlük</NavLink>
           <NavLink href="/kesfet">Keşfet</NavLink>
@@ -90,7 +101,78 @@ export default function Navigation() {
             )
           )}
         </div>
+
+        {/* Hamburger butonu (mobil) */}
+        <button
+          onClick={() => setMenuAcik(!menuAcik)}
+          className="sm:hidden flex items-center justify-center w-10 h-10 -mr-2 rounded-lg text-body hover:bg-border/30 active:scale-95"
+          style={{ transition: 'background-color 0.2s, transform 0.15s' }}
+          aria-label="Menü"
+        >
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            {menuAcik ? (
+              <path d="M18 6L6 18M6 6l12 12" />
+            ) : (
+              <>
+                <line x1="3" y1="6" x2="21" y2="6" />
+                <line x1="3" y1="12" x2="21" y2="12" />
+                <line x1="3" y1="18" x2="21" y2="18" />
+              </>
+            )}
+          </svg>
+        </button>
       </div>
+
+      {/* Mobil menü */}
+      {menuAcik && (
+        <>
+          <div
+            className="sm:hidden fixed inset-0 top-14 bg-black/20 backdrop-blur-sm z-40"
+            onClick={() => setMenuAcik(false)}
+          />
+          <div
+            className="sm:hidden fixed top-14 left-0 right-0 z-50 bg-card border-b border-border shadow-elevated animate-scale-in"
+          >
+            <div className="flex flex-col py-2 px-4">
+              <MobilLink href="/" onClick={() => setMenuAcik(false)}>Bugün</MobilLink>
+              <MobilLink href="/gunluk" onClick={() => setMenuAcik(false)}>Günlük</MobilLink>
+              <MobilLink href="/kesfet" onClick={() => setMenuAcik(false)}>Keşfet</MobilLink>
+              <MobilLink href="/oneriler" onClick={() => setMenuAcik(false)}>Öner</MobilLink>
+
+              {!yukleniyor && (
+                girisYapildi ? (
+                  <>
+                    <MobilLink href="/profil" onClick={() => setMenuAcik(false)}>Profil</MobilLink>
+                    <div className="border-t border-border mt-1 pt-1">
+                      <button
+                        onClick={() => { setMenuAcik(false); cikisYap() }}
+                        className="w-full text-left px-3 py-3 text-sm font-medium text-danger/80 hover:text-danger hover:bg-danger/5 rounded-lg"
+                        style={{ transition: 'color 0.2s, background-color 0.2s' }}
+                      >
+                        Çıkış Yap
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <div className="border-t border-border mt-1 pt-2 pb-1">
+                    <a
+                      href="/giris"
+                      onClick={() => setMenuAcik(false)}
+                      className="block w-full text-center py-2.5 rounded-lg text-white font-medium text-sm"
+                      style={{
+                        backgroundColor: 'var(--color-secondary)',
+                        boxShadow: '0 1px 2px rgba(45,106,79,0.2)',
+                      }}
+                    >
+                      Giriş Yap
+                    </a>
+                  </div>
+                )
+              )}
+            </div>
+          </div>
+        </>
+      )}
     </nav>
   )
 }
@@ -110,6 +192,19 @@ function NavLink({ href, children }: { href: string; children: React.ReactNode }
           transform: 'translateX(-50%)',
         }}
       />
+    </a>
+  )
+}
+
+function MobilLink({ href, children, onClick }: { href: string; children: React.ReactNode; onClick: () => void }) {
+  return (
+    <a
+      href={href}
+      onClick={onClick}
+      className="px-3 py-3 text-sm font-medium text-body hover:text-primary hover:bg-background/80 rounded-lg"
+      style={{ transition: 'color 0.2s, background-color 0.2s' }}
+    >
+      {children}
     </a>
   )
 }

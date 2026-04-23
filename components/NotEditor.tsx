@@ -385,7 +385,7 @@ export default function NotEditor({ soruId, mevcutNot, girisYapildi }: NotEditor
         <button
           onClick={kaydet}
           disabled={form.kaydediliyor || limitAsildi || bos}
-          className="flex-shrink-0 px-6 py-3 rounded-lg text-white font-medium text-sm disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
+          className="w-full sm:w-auto flex-shrink-0 px-6 py-3 rounded-lg text-white font-medium text-sm disabled:cursor-not-allowed focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-secondary"
           style={{
             backgroundColor: limitAsildi ? 'var(--color-danger)' : 'var(--color-secondary)',
             opacity: (bos && !form.kaydediliyor) ? 0.4 : limitAsildi ? 1 : 1,

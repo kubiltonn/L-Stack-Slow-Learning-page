@@ -83,74 +83,76 @@ export default function TakvimGorunu({ notlar }: TakvimGorunuProps) {
 
   return (
     <div className="space-y-6">
-      <div className="overflow-x-auto pb-2">
-        <div className="flex mb-1 ml-8" style={{ gap: '0px' }}>
-          {ayEtiketleri.map((etiket, i) => (
-            <span
-              key={i}
-              className="text-xs text-muted"
-              style={{
-                position: 'relative',
-                left: `${etiket.index * 14}px`,
-                marginRight: i < ayEtiketleri.length - 1 ? '0px' : '0px',
-              }}
-            >
-              {etiket.ay}
-            </span>
-          ))}
-        </div>
+      <div className="overflow-x-auto -mx-1 px-1 pb-2">
+        <div style={{ minWidth: 'fit-content' }}>
+          <div className="flex mb-1" style={{ paddingLeft: '30px' }}>
+            {ayEtiketleri.map((etiket, i) => {
+              const sonrakiIndex = i < ayEtiketleri.length - 1 ? ayEtiketleri[i + 1].index : haftalar.length
+              const genislik = (sonrakiIndex - etiket.index) * 14
+              return (
+                <span
+                  key={i}
+                  className="text-[10px] sm:text-xs text-muted inline-block"
+                  style={{ width: `${genislik}px` }}
+                >
+                  {etiket.ay}
+                </span>
+              )
+            })}
+          </div>
 
-        <div className="flex gap-0.5">
-          <div className="flex flex-col gap-0.5 mr-1.5 pt-0.5">
-            {gunIsimleri.map((isim, i) => (
-              <div key={i} className="h-[13px] flex items-center">
-                <span className="text-[10px] text-muted w-6 text-right">{isim}</span>
+          <div className="flex gap-0.5">
+            <div className="flex flex-col gap-0.5 mr-1 pt-0.5 flex-shrink-0">
+              {gunIsimleri.map((isim, i) => (
+                <div key={i} className="h-[11px] sm:h-[13px] flex items-center">
+                  <span className="text-[9px] sm:text-[10px] text-muted w-5 sm:w-6 text-right">{isim}</span>
+                </div>
+              ))}
+            </div>
+
+            {haftalar.map((hafta, haftaIdx) => (
+              <div key={haftaIdx} className="flex flex-col gap-0.5">
+                {Array.from({ length: 7 }).map((_, gunIdx) => {
+                  const gun = hafta[gunIdx]
+                  if (!gun) {
+                    return <div key={gunIdx} className="w-[11px] h-[11px] sm:w-[13px] sm:h-[13px]" />
+                  }
+
+                  const tarih = tarihStr(gun)
+                  const not = notHaritasi.get(tarih)
+                  const renk = hucreRengi(not?.kelime_sayisi)
+                  const bugun = tarihStr(new Date())
+                  const bugunMu = tarih === bugun
+                  const seciliMi = seciliTarih === tarih
+
+                  return (
+                    <button
+                      key={gunIdx}
+                      onClick={() => setSeciliTarih(seciliMi ? null : tarih)}
+                      className="heatmap-cell w-[11px] h-[11px] sm:w-[13px] sm:h-[13px] rounded-[2px] hover:scale-150 focus-visible:outline-1 focus-visible:outline-offset-1 focus-visible:outline-secondary"
+                      style={{
+                        backgroundColor: renk,
+                        animationDelay: `${(haftaIdx * 7 + gunIdx) * 8}ms`,
+                        outline: bugunMu ? '2px solid var(--color-secondary)' : seciliMi ? '2px solid var(--color-accent)' : 'none',
+                        outlineOffset: bugunMu || seciliMi ? '1px' : '0',
+                        transition: 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
+                      }}
+                      title={`${gun.toLocaleDateString('tr-TR')}${not ? ` — ${not.kelime_sayisi} kelime` : ''}`}
+                    />
+                  )
+                })}
               </div>
             ))}
           </div>
-
-          {haftalar.map((hafta, haftaIdx) => (
-            <div key={haftaIdx} className="flex flex-col gap-0.5">
-              {Array.from({ length: 7 }).map((_, gunIdx) => {
-                const gun = hafta[gunIdx]
-                if (!gun) {
-                  return <div key={gunIdx} className="w-[13px] h-[13px]" />
-                }
-
-                const tarih = tarihStr(gun)
-                const not = notHaritasi.get(tarih)
-                const renk = hucreRengi(not?.kelime_sayisi)
-                const bugun = tarihStr(new Date())
-                const bugunMu = tarih === bugun
-                const seciliMi = seciliTarih === tarih
-
-                return (
-                  <button
-                    key={gunIdx}
-                    onClick={() => setSeciliTarih(seciliMi ? null : tarih)}
-                    className="heatmap-cell w-[13px] h-[13px] rounded-[2px] hover:scale-150 focus-visible:outline-1 focus-visible:outline-offset-1 focus-visible:outline-secondary"
-                    style={{
-                      backgroundColor: renk,
-                      animationDelay: `${(haftaIdx * 7 + gunIdx) * 8}ms`,
-                      outline: bugunMu ? '2px solid var(--color-secondary)' : seciliMi ? '2px solid var(--color-accent)' : 'none',
-                      outlineOffset: bugunMu || seciliMi ? '1px' : '0',
-                      transition: 'transform 0.2s cubic-bezier(0.34, 1.56, 0.64, 1)',
-                    }}
-                    title={`${gun.toLocaleDateString('tr-TR')}${not ? ` — ${not.kelime_sayisi} kelime` : ''}`}
-                  />
-                )
-              })}
-            </div>
-          ))}
         </div>
       </div>
 
-      <div className="flex items-center gap-2 text-xs text-muted">
+      <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-xs text-muted">
         <span>Az</span>
         {['var(--color-heatmap-0)', 'var(--color-heatmap-1)', 'var(--color-heatmap-2)', 'var(--color-heatmap-3)', 'var(--color-heatmap-4)'].map((renk, i) => (
           <div
             key={i}
-            className="w-[13px] h-[13px] rounded-[2px]"
+            className="w-[11px] h-[11px] sm:w-[13px] sm:h-[13px] rounded-[2px]"
             style={{ backgroundColor: renk }}
           />
         ))}

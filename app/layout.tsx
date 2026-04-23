@@ -34,11 +34,11 @@ export default function RootLayout({
 
         <Navigation />
 
-        <main className="flex-1 w-full max-w-3xl mx-auto px-6 sm:px-8 lg:px-4 py-8">
+        <main className="flex-1 w-full max-w-3xl mx-auto px-4 sm:px-8 lg:px-4 py-6 sm:py-8">
           {children}
         </main>
 
-        <footer className="w-full max-w-3xl mx-auto px-6 sm:px-8 lg:px-4 py-8 border-t border-border">
+        <footer className="w-full max-w-3xl mx-auto px-4 sm:px-8 lg:px-4 py-6 sm:py-8 border-t border-border">
           <p className="text-sm text-muted text-center" style={{ fontFamily: 'var(--font-body)' }}>
             L-Stack — Her gün bir adım
           </p>
