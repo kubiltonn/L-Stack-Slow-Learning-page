@@ -3,7 +3,7 @@ import { createServerClient } from '@supabase/ssr'
 
 const korunmusRotalar = ['/gunluk', '/profil', '/oneriler']
 
-export async function middleware(request: NextRequest) {
+export async function proxy(request: NextRequest) {
   const response = NextResponse.next({
     request: { headers: request.headers },
   })
