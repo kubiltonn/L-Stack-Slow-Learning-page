@@ -1,36 +1,79 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# L-Stack (Slow Learning)
 
-## Getting Started
+Günde tek soru, tek not. Kişisel bilgi arşivini oluştur, toplulukla paylaş.
 
-First, run the development server:
+## Hakkında
+
+L-Stack, yavaş öğrenme felsefesiyle tasarlanmış bir platformdur. Her gün tek bir düşündürücü soru yayınlanır. Kullanıcılar bu soruya kısa bir not yazarak kendi bilgi arşivlerini oluştururlar. Notlar varsayılan olarak özeldir, dileyen toplulukla paylaşabilir.
+
+## Özellikler
+
+- **Günlük Soru** — Her gün gece yarısı (UTC+3) yeni bir soru
+- **Not Defteri** — Max 300 kelimelik kısa notlar, düzenleme desteği
+- **Takvim Görünümü** — Hangi gün yazdığını, serilerini takip et
+- **Keşfet** — Topluluk notlarını oku, ilham al
+- **Rozet Sistemi** — Seri, not sayısı, paylaşım gibi başarılar
+- **Etiketler** — Notlarını kategorize et, filtrele
+- **Arama** — Tüm notlarında metin ve etiket bazlı arama
+- **Profil & İstatistikler** — Kelime sayısı, seri, en aktif günler
+
+## Teknolojiler
+
+| Katman | Teknoloji |
+|--------|-----------|
+| Framework | Next.js 14 (App Router) |
+| Veritabani | Supabase (PostgreSQL) |
+| Auth | Supabase Auth |
+| Styling | Tailwind CSS |
+| Dil | TypeScript |
+| Hosting | Vercel |
+
+## Kurulum
 
 ```bash
+# Repoyu klonla
+git clone https://github.com/kubiltonn/L-Stack-Slow-Learning-page.git
+cd L-Stack-Slow-Learning-page
+
+# Bağımlılıkları yükle
+npm install
+
+# Ortam değişkenlerini ayarla
+cp .env.example .env.local
+# .env.local dosyasını Supabase bilgilerinle doldur
+
+# Geliştirme sunucusunu başlat
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Tarayıcıda [http://localhost:3000](http://localhost:3000) adresini aç.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Ortam Degiskenleri
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+`.env.local` dosyasında aşağıdaki değişkenler gerekli:
 
-## Learn More
+```
+NEXT_PUBLIC_SUPABASE_URL=
+NEXT_PUBLIC_SUPABASE_ANON_KEY=
+SUPABASE_SERVICE_ROLE_KEY=
+```
 
-To learn more about Next.js, take a look at the following resources:
+## Proje Yapisi
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+```
+app/
+  page.tsx              Ana sayfa (gunun sorusu)
+  gunluk/               Kisisel gunluk & takvim
+  kesfet/               Topluluk notlari
+  profil/               Istatistikler & profil
+  oneriler/             Soru onerileri
+  api/                  Backend endpoint'leri
+components/             UI bileşenleri
+lib/                    Yardimci fonksiyonlar & tipler
+supabase/               Veritabani semasi & seed
+docs/                   Proje dokumantasyonu
+```
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+## Lisans
 
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+MIT
