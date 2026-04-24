@@ -5,19 +5,29 @@ import { createClient } from '@/lib/supabase'
 
 export default function Navigation() {
   const [girisYapildi, setGirisYapildi] = useState(false)
+  const [isAdmin, setIsAdmin] = useState(false)
   const [yukleniyor, setYukleniyor] = useState(true)
   const [menuAcik, setMenuAcik] = useState(false)
 
   useEffect(() => {
     const supabase = createClient()
 
-    supabase.auth.getUser().then(({ data: { user } }) => {
+    supabase.auth.getUser().then(async ({ data: { user } }) => {
       setGirisYapildi(!!user)
+      if (user) {
+        const { data: profil } = await supabase
+          .from('profiller')
+          .select('is_admin')
+          .eq('id', user.id)
+          .single()
+        setIsAdmin(profil?.is_admin === true)
+      }
       setYukleniyor(false)
     })
 
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
       setGirisYapildi(!!session?.user)
+      if (!session?.user) setIsAdmin(false)
     })
 
     return () => subscription.unsubscribe()
@@ -76,6 +86,7 @@ export default function Navigation() {
             girisYapildi ? (
               <>
                 <NavLink href="/profil">Profil</NavLink>
+                {isAdmin && <NavLink href="/admin">Admin</NavLink>}
                 <button
                   onClick={cikisYap}
                   className="px-3 py-1.5 text-sm font-medium text-muted rounded-lg hover:bg-danger/5 hover:text-danger focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-danger active:scale-[0.97]"
@@ -143,6 +154,7 @@ export default function Navigation() {
                 girisYapildi ? (
                   <>
                     <MobilLink href="/profil" onClick={() => setMenuAcik(false)}>Profil</MobilLink>
+                    {isAdmin && <MobilLink href="/admin" onClick={() => setMenuAcik(false)}>Admin</MobilLink>}
                     <div className="border-t border-border mt-1 pt-1">
                       <button
                         onClick={() => { setMenuAcik(false); cikisYap() }}

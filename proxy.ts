@@ -1,7 +1,7 @@
 import { NextResponse, type NextRequest } from 'next/server'
 import { createServerClient } from '@supabase/ssr'
 
-const korunmusRotalar = ['/gunluk', '/profil', '/oneriler']
+const korunmusRotalar = ['/gunluk', '/profil', '/oneriler', '/admin']
 
 export async function proxy(request: NextRequest) {
   const response = NextResponse.next({

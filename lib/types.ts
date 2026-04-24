@@ -22,6 +22,15 @@ export interface Profil {
   kullanici_adi: string
   bio: string | null
   avatar_url: string | null
+  is_admin: boolean
+  created_at: string
+}
+
+export interface SoruHavuzu {
+  id: string
+  soru_metni: string
+  kategori: string
+  kullanildi: boolean
   created_at: string
 }
 

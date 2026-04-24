@@ -3,6 +3,8 @@ import { bugunTarih } from '@/lib/utils'
 import IlhamButonu from '@/components/IlhamButonu'
 import TarihFiltresi from '@/components/TarihFiltresi'
 
+export const dynamic = 'force-dynamic'
+
 export default async function KesfetSayfasi({
   searchParams,
 }: {
@@ -21,14 +23,34 @@ export default async function KesfetSayfasi({
     .eq('tarih', tarih)
     .single()
 
-  const { data: notlar } = await supabase
-    .from('notlar')
-    .select('*, profiller(kullanici_adi)')
-    .eq('paylasim', true)
-    .eq('soru_id', soru?.id || '')
-    .order('created_at', { ascending: false })
+  // Notları ve profilleri ayrı çek (doğrudan FK olmadığı için join çalışmayabiliyor)
+  const { data: notlar, error: notlarError } = soru
+    ? await supabase
+        .from('notlar')
+        .select('*')
+        .eq('paylasim', true)
+        .eq('soru_id', soru.id)
+        .order('created_at', { ascending: false })
+    : { data: [], error: null }
+
+  if (notlarError) {
+    console.error('Notlar yüklenemedi:', notlarError)
+  }
 
   const paylasimlar = notlar || []
+
+  // Profilleri ayrı çek
+  const kullaniciIdleri = [...new Set(paylasimlar.map(n => n.kullanici_id))]
+  const { data: profiller } = kullaniciIdleri.length > 0
+    ? await supabase
+        .from('profiller')
+        .select('id, kullanici_adi')
+        .in('id', kullaniciIdleri)
+    : { data: [] }
+
+  const profilHaritasi = new Map(
+    (profiller || []).map((p: { id: string; kullanici_adi: string }) => [p.id, p.kullanici_adi])
+  )
 
   const notIdleri = paylasimlar.map(n => n.id)
 
@@ -125,7 +147,7 @@ export default async function KesfetSayfasi({
       ) : (
         <div className="space-y-4">
           {paylasimlar.map((not) => {
-            const profil = (not as unknown as Record<string, unknown>).profiller as { kullanici_adi: string } | null
+            const kullaniciAdi = profilHaritasi.get(not.kullanici_id) || null
             return (
               <div
                 key={not.id}
@@ -135,11 +157,11 @@ export default async function KesfetSayfasi({
                   <div className="flex items-center gap-2">
                     <div className="w-7 h-7 rounded-full bg-secondary/10 flex items-center justify-center">
                       <span className="text-xs font-medium text-secondary">
-                        {profil?.kullanici_adi?.[0]?.toUpperCase() || '?'}
+                        {kullaniciAdi?.[0]?.toUpperCase() || '?'}
                       </span>
                     </div>
                     <span className="text-sm font-medium text-foreground">
-                      {profil?.kullanici_adi || 'Anonim'}
+                      {kullaniciAdi || 'Anonim'}
                     </span>
                   </div>
                   <span className="text-xs text-muted tabular-nums">
